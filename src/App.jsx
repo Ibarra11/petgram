@@ -1,5 +1,6 @@
 import React from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import Spinner from "./Spinner";
 
 function App() {
   const fetchDogs = async ({ pageParam }) => {
@@ -36,13 +37,10 @@ function App() {
       const isAtBottom =
         window.innerHeight + window.scrollY >=
         document.documentElement.offsetHeight - 40;
-      console.log(isAtBottom);
       if (isAtBottom && hasNextPage) {
-        console.log("test");
         fetchNextPage();
       }
     }
-
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
@@ -58,12 +56,17 @@ function App() {
 
   return (
     <main className="relative bg-slate-100 min-h-screen  pt-20 pb-8">
-      <div className="grid  grid-cols-3 max-w-7xl w-full mx-auto gap-4">
+      <Spinner />
+      {/* <div className="columns-3 gap-3 max-w-7xl w-full mx-auto ">
         {data.pages.map((dogs, i) => {
           return (
             <React.Fragment key={i}>
-              {dogs.map((dog) => (
-                <Dog key={dog.id} {...dog} />
+              {dogs.map(({ url }) => (
+                <img
+                  className="w-full mb-10 rounded-lg"
+                  src={url}
+                  alt="a dog"
+                />
               ))}
             </React.Fragment>
           );
@@ -71,7 +74,7 @@ function App() {
       </div>
       {isFetching && (
         <div className="absolute bottom-5 left-1/2 -translate-x-full">....</div>
-      )}
+      )} */}
     </main>
   );
 }
