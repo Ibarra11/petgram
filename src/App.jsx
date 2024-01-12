@@ -55,9 +55,8 @@ function App() {
   }
 
   return (
-    <main className="relative bg-slate-100 min-h-screen  pt-20 pb-8">
-      <Spinner />
-      {/* <div className="columns-3 gap-3 max-w-7xl w-full mx-auto ">
+    <main className="relative bg-slate-100 min-h-screen pt-24 pb-20">
+      <div className="columns-3 gap-3 max-w-7xl w-full mx-auto ">
         {data.pages.map((dogs, i) => {
           return (
             <React.Fragment key={i}>
@@ -73,8 +72,10 @@ function App() {
         })}
       </div>
       {isFetching && (
-        <div className="absolute bottom-5 left-1/2 -translate-x-full">....</div>
-      )} */}
+        <div className="absolute bottom-10 translate-y-1/2 left-1/2 -translate-x-1/2">
+          <Spinner />
+        </div>
+      )}
     </main>
   );
 }
