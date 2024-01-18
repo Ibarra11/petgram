@@ -3,6 +3,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import useAtBottom from "../hooks/useAtBottom";
 import Dog from "../components/Dog";
 import Spinner from "../components/Spinner";
+import DogSkeleton from "../components/DogSkeleton";
 export default function Favorites() {
   const fetchFavoriteDogs = async ({ pageParam }) => {
     const res = await fetch(
@@ -42,29 +43,27 @@ export default function Favorites() {
     }
   }, [isAtBottom]);
 
-  if (status === "pending") {
-    return <p>Pending</p>;
-  }
-  if (status === "error") {
-    return <p>{error.message}</p>;
-  }
   return (
     <>
-      {data.pages.map((dogs, i) => {
-        return (
-          <React.Fragment key={i}>
-            {dogs.map(({ image, id }) => (
-              <Dog
-                includeActions={false}
-                key={id}
-                id={image.id}
-                url={image.url}
-              />
-            ))}
-          </React.Fragment>
-        );
-      })}
-      {isFetching && (
+      {status === "pending" ? (
+        <DogSkeleton count={9} />
+      ) : (
+        data.pages.map((dogs, i) => {
+          return (
+            <React.Fragment key={i}>
+              {dogs.map(({ image, id }) => (
+                <Dog
+                  includeActions={false}
+                  key={id}
+                  id={image.id}
+                  url={image.url}
+                />
+              ))}
+            </React.Fragment>
+          );
+        })
+      )}
+      {isFetching && hasNextPage && (
         <div className="absolute bottom-10 translate-y-1/2 left-1/2 -translate-x-1/2">
           <Spinner />
         </div>

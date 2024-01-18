@@ -1,5 +1,6 @@
 import { Outlet, NavLink } from "react-router-dom";
 import { PlusIcon } from "@heroicons/react/24/solid";
+
 export default function Root() {
   async function handleUpload(e) {
     var myHeaders = new Headers();
@@ -21,7 +22,7 @@ export default function Root() {
       .catch((error) => console.log("error", error));
   }
   return (
-    <div className="flex gap-12 items-start  pt-16 px-12 min-h-screen bg-gray-100">
+    <div className="flex gap-12 items-start  pt-16 px-12 min-h-screen bg-gray-100 overflow-hidden">
       <aside className="sticky top-4 w-60">
         <nav className="mb-8">
           <ul className="space-y-4">
