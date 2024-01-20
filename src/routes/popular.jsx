@@ -1,47 +1,23 @@
 import React from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import useAtBottom from "../hooks/useAtBottom";
+
 import Dog from "../components/Dog";
 import Spinner from "../components/Spinner";
 import DogSkeleton from "../components/DogSkeleton";
+import useDogQuery from "../hooks/useDogQuery";
+const fetchPopularDogs = async ({ pageParam }) => {
+  const res = await fetch(
+    `${import.meta.env.VITE_VOTE_URL}&limit=12&page=${pageParam}`
+  );
+  if (!res.ok) {
+    throw new Error("Something went wrong with request");
+  }
+  return res.json();
+};
 export default function Popular() {
-  const fetchPopularDogs = async ({ pageParam }) => {
-    const res = await fetch(
-      `${import.meta.env.VITE_VOTE_URL}&limit=12&page=${pageParam}&order=DESC`
-    );
-    if (!res.ok) {
-      throw new Error("Something went wrong with request");
-    }
-    return res.json();
-  };
-
-  const {
-    data,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    isFetchingNextPage,
-    status,
-  } = useInfiniteQuery({
-    queryKey: ["popularDogs"],
-    queryFn: fetchPopularDogs,
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages, lastPageParam) => {
-      if (lastPage.length === 0) {
-        return undefined;
-      }
-      return lastPageParam + 1;
-    },
-  });
-  const isAtBottom = useAtBottom();
-
-  React.useEffect(() => {
-    if (isAtBottom && hasNextPage) {
-      fetchNextPage();
-    }
-  }, [isAtBottom]);
-
+  const { data, status, isFetching, hasNextPage } = useDogQuery(
+    "popularDogs",
+    fetchPopularDogs
+  );
   return (
     <>
       {status === "pending" ? (

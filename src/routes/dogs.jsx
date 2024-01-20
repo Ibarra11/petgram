@@ -1,46 +1,71 @@
 import React from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import useAtBottom from "../hooks/useAtBottom";
 import Dog from "../components/Dog";
 import Spinner from "../components/Spinner";
 import DogSkeleton from "../components/DogSkeleton";
-export default function Dogs() {
-  const fetchDogs = async ({ pageParam }) => {
-    const res = await fetch(
-      `${import.meta.env.VITE_SEARCH_URL}&limit=12&page=${pageParam}`
-    );
+import useDogQuery from "../hooks/useDogQuery";
+
+const fetchDogs = async ({ pageParam }) => {
+  const resForDogs = fetch(
+    `${import.meta.env.VITE_SEARCH_URL}&limit=12&page=${pageParam}`
+  ).then((res) => {
     if (!res.ok) {
-      throw new Error("Something went wrong with request");
+      throw new Error();
     }
     return res.json();
-  };
-
-  const {
-    data,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    isFetchingNextPage,
-    status,
-  } = useInfiniteQuery({
-    queryKey: ["dogs"],
-    queryFn: fetchDogs,
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages, lastPageParam) => {
-      if (lastPage.length === 0) {
-        return undefined;
-      }
-      return lastPageParam + 1;
-    },
   });
-  const isAtBottom = useAtBottom();
-
-  React.useEffect(() => {
-    if (isAtBottom && hasNextPage) {
-      fetchNextPage();
+  const resForFavoritedDogs = fetch(
+    `${import.meta.env.VITE_FAVORITES_URL}&sub_id=${
+      import.meta.env.VITE_SUB_ID
+    }`
+  ).then((res) => {
+    if (!res.ok) {
+      throw new Error();
     }
-  }, [isAtBottom]);
+    return res.json();
+  });
+  const resForPopularDogs = await fetch(
+    `${import.meta.env.VITE_VOTE_URL}`
+  ).then((res) => {
+    if (!res.ok) {
+      throw new Error();
+    }
+    return res.json();
+  });
+  try {
+    const [dogs, favoritedDogs, popularDogs] = await Promise.all([
+      resForDogs,
+      resForFavoritedDogs,
+      resForPopularDogs,
+    ]);
+
+    return dogs.map((dog) => {
+      const resultDog = { ...dog, score: 0, liked: false };
+      const popularDog = popularDogs.find(
+        (popularDog) => popularDog.image_id === dog.id
+      );
+      if (popularDog) {
+        resultDog.score = popularDog.value;
+      }
+
+      if (
+        favoritedDogs.some((favoritedDog) => {
+          return favoritedDog.image_id === dog.id;
+        })
+      ) {
+        resultDog.liked = true;
+      }
+      return resultDog;
+    });
+  } catch (e) {
+    throw new Error();
+  }
+};
+
+export default function Dogs() {
+  const { data, hasNextPage, status, isFetching } = useDogQuery(
+    "dogs",
+    fetchDogs
+  );
 
   return (
     <>
@@ -50,8 +75,15 @@ export default function Dogs() {
         data.pages.map((dogs, i) => {
           return (
             <React.Fragment key={i}>
-              {dogs.map(({ url, id }) => (
-                <Dog includeActions={true} key={id} id={id} url={url} />
+              {dogs.map(({ url, id, liked, score }) => (
+                <Dog
+                  liked={liked}
+                  includeActions={true}
+                  key={id}
+                  id={id}
+                  url={url}
+                  score={score}
+                />
               ))}
             </React.Fragment>
           );

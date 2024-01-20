@@ -4,10 +4,12 @@ import {
   HandThumbUpIcon,
   HandThumbDownIcon,
   HeartIcon,
+  ChartBarIcon,
 } from "@heroicons/react/24/solid";
-export default function Dog({ id, url, includeActions }) {
+import { useQueryClient } from "@tanstack/react-query";
+export default function Dog({ id, url, includeActions, liked, score }) {
+  const queryClient = useQueryClient();
   const [isPending, setisPending] = React.useState(false);
-
   function handleVote(data) {
     return fetch(import.meta.env.VITE_VOTE_URL, {
       method: "POST",
@@ -19,32 +21,34 @@ export default function Dog({ id, url, includeActions }) {
   }
 
   async function handleUpVote() {
+    setisPending(true);
     try {
-      setisPending(true);
       const body = {
         image_id: id,
-        value: 1,
+        value: value + 1,
       };
       await handleVote(body);
+      queryClient.invalidateQueries({ queryKey: ["dogs"] });
     } catch (e) {
     } finally {
       setisPending(false);
-      updateLocalStorage({ id });
     }
   }
   async function handleDownVote() {
+    setisPending(true);
     try {
-      setisPending(true);
       const body = {
         image_id: id,
-        value: -1,
+        value: value - 1,
       };
       await handleVote(body);
+      queryClient.invalidateQueries({ queryKey: ["dogs"] });
     } catch (e) {
     } finally {
       setisPending(false);
     }
   }
+
   async function handleLike() {
     try {
       await fetch(import.meta.env.VITE_FAVORITES_URL, {
@@ -57,6 +61,7 @@ export default function Dog({ id, url, includeActions }) {
           "Content-Type": "application/json",
         },
       });
+      queryClient.invalidateQueries({ queryKey: ["dogs"] });
     } catch (e) {
     } finally {
       setisPending(false);
@@ -64,18 +69,26 @@ export default function Dog({ id, url, includeActions }) {
   }
 
   return (
-    <div className="relative rounded-lg break-inside-avoid">
-      <img className="w-full" src={url} alt="a dog" />
+    <div className="relative rounded-lg overflow-hidden break-inside-avoid">
+      <img
+        className="w-full hover:scale-105 transition-transform"
+        src={url}
+        alt="a dog"
+      />
       {includeActions && (
         <div className=" flex justify-between items-center border border-gray-200 py-4 px-4">
           <button onClick={handleLike} className="group">
             <HeartIcon
-              className="fill-transparent stroke-gray-700 group-hover:fill-pink-500 group-hover:stroke-transparent transition-colors"
+              className={`transition-colors ${
+                liked
+                  ? "fill-pink-500"
+                  : "fill-transparent stroke-gray-700 group-hover:fill-pink-500 group-hover:stroke-transparent"
+              }`}
               height={24}
               width={24}
             />
           </button>
-          <div className="flex gap-4 justify-between">
+          <div className="flex gap-8 justify-between">
             <button onClick={handleUpVote} className="group">
               <HandThumbUpIcon
                 className="fill-transparent stroke-gray-700 group-hover:fill-green-700 group-hover:stroke-transparent transition-colors"
@@ -95,6 +108,10 @@ export default function Dog({ id, url, includeActions }) {
                 <Spinner />
               </div>
             )}
+          </div>
+          <div className="flex items-center gap-1">
+            <ChartBarIcon className="fill-gray-700" height={24} width={24} />
+            <span className="font-medium">{score}</span>
           </div>
         </div>
       )}
