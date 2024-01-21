@@ -7,43 +7,48 @@ import {
   ChartBarIcon,
 } from "@heroicons/react/24/solid";
 import { useQueryClient } from "@tanstack/react-query";
+
+function handleVote(data) {
+  return fetch(import.meta.env.VITE_VOTE_URL, {
+    method: "POST",
+    body: JSON.stringify({ ...data, sub_id: import.meta.env.VITE_SUB_ID }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+}
+
 export default function Dog({ id, url, includeActions, liked, score }) {
   const queryClient = useQueryClient();
   const [isPending, setisPending] = React.useState(false);
-  function handleVote(data) {
-    return fetch(import.meta.env.VITE_VOTE_URL, {
-      method: "POST",
-      body: JSON.stringify({ ...data, sub_id: import.meta.env.VITE_SUB_ID }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  }
 
   async function handleUpVote() {
     setisPending(true);
     try {
       const body = {
         image_id: id,
-        value: value + 1,
+        value: score + 1,
       };
       await handleVote(body);
       queryClient.invalidateQueries({ queryKey: ["dogs"] });
     } catch (e) {
+      console.error(e);
     } finally {
       setisPending(false);
     }
   }
+
   async function handleDownVote() {
     setisPending(true);
     try {
       const body = {
         image_id: id,
-        value: value - 1,
+        value: score - 1,
       };
       await handleVote(body);
       queryClient.invalidateQueries({ queryKey: ["dogs"] });
     } catch (e) {
+      console.error(e);
     } finally {
       setisPending(false);
     }
