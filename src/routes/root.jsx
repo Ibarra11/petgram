@@ -22,9 +22,9 @@ export default function Root() {
       .catch((error) => console.log("error", error));
   }
   return (
-    <div className="flex gap-12 items-start  pt-16 px-12 min-h-screen bg-gray-100 overflow-hidden">
-      <aside className="sticky top-4 w-60">
-        <nav className="mb-8">
+    <div className="flex gap-12  pt-16 px-12 min-h-screen bg-gray-100 overflow-clip items-start">
+      <aside className="w-60 sticky top-4">
+        <nav className="  mb-8">
           <ul className="space-y-4">
             <li>
               <NavLink
@@ -97,6 +97,7 @@ export default function Root() {
           </div>
         </div>
       </aside>
+
       <main className="relative flex-1 pb-20">
         <div className="columns-3 gap-3 space-y-10 min-h-screen">
           <Outlet />
