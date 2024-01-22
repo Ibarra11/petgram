@@ -4,6 +4,7 @@ import Dog from "../components/Dog";
 import Spinner from "../components/Spinner";
 import DogSkeleton from "../components/DogSkeleton";
 import useDogQuery from "../hooks/useDogQuery";
+import PopularDog from "../components/PopularDog";
 const fetchPopularDogs = async ({ pageParam }) => {
   const res = await fetch(
     `${import.meta.env.VITE_VOTE_URL}&limit=12&page=${pageParam}`
@@ -20,19 +21,14 @@ export default function Popular() {
   );
   return (
     <>
-      {status === "pending" ? (
+      {status === "pending" || isFetching ? (
         <DogSkeleton count={9} />
       ) : (
         data.pages.map((dogs, i) => {
           return (
             <React.Fragment key={i}>
-              {dogs.map(({ image, id }) => (
-                <Dog
-                  includeActions={false}
-                  key={id}
-                  id={image.id}
-                  url={image.url}
-                />
+              {dogs.map(({ image, id, value }) => (
+                <PopularDog votes={value} key={id} url={image.url} />
               ))}
             </React.Fragment>
           );

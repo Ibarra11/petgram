@@ -3,6 +3,7 @@ import Dog from "../components/Dog";
 import Spinner from "../components/Spinner";
 import DogSkeleton from "../components/DogSkeleton";
 import useDogQuery from "../hooks/useDogQuery";
+import { DogWithActions } from "../components/DogWithActions";
 
 const fetchDogs = async ({ pageParam }) => {
   const resForDogs = fetch(
@@ -73,7 +74,7 @@ export default function Dogs() {
           return (
             <React.Fragment key={i}>
               {dogs.map(({ url, id, liked, score, favoriteId }) => (
-                <Dog
+                <DogWithActions
                   liked={liked}
                   includeActions={true}
                   key={id}

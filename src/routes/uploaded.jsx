@@ -46,8 +46,8 @@ export default function UploadedDogs() {
 
   return (
     <>
-      {status === "pending" ? (
-        <DogSkeleton />
+      {status === "pending" || isFetching ? (
+        <DogSkeleton count={9} />
       ) : (
         data.pages.map((dogs, i) => {
           return (
