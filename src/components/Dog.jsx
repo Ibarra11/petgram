@@ -18,7 +18,14 @@ function handleVote(data) {
   });
 }
 
-export default function Dog({ id, url, includeActions, liked, score }) {
+export default function Dog({
+  imageId,
+  favoriteId,
+  url,
+  includeActions,
+  liked,
+  score,
+}) {
   const queryClient = useQueryClient();
   const [isPending, setisPending] = React.useState(false);
 
@@ -26,7 +33,7 @@ export default function Dog({ id, url, includeActions, liked, score }) {
     setisPending(true);
     try {
       const body = {
-        image_id: id,
+        image_id: imageId,
         value: score + 1,
       };
       await handleVote(body);
@@ -42,7 +49,7 @@ export default function Dog({ id, url, includeActions, liked, score }) {
     setisPending(true);
     try {
       const body = {
-        image_id: id,
+        image_id: imageId,
         value: score - 1,
       };
       await handleVote(body);
@@ -54,18 +61,44 @@ export default function Dog({ id, url, includeActions, liked, score }) {
     }
   }
 
+  async function handleDeleteLike() {
+    try {
+      await fetch(
+        `${import.meta.env.VITE_FAVORITES_URL}/${favoriteId}?api_key=${
+          import.meta.env.VITE_API_KEY
+        }`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      queryClient.invalidateQueries({ queryKey: ["dogs"] });
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setisPending(false);
+    }
+  }
+
   async function handleLike() {
     try {
-      await fetch(import.meta.env.VITE_FAVORITES_URL, {
-        method: "POST",
-        body: JSON.stringify({
-          image_id: id,
-          sub_id: import.meta.env.VITE_SUB_ID,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      await fetch(
+        `${import.meta.env.VITE_FAVORITES_URL}?api_key=${
+          import.meta.env.VITE_API_KEY
+        }`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            image_id: imageId,
+            sub_id: import.meta.env.VITE_SUB_ID,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       queryClient.invalidateQueries({ queryKey: ["dogs"] });
     } catch (e) {
     } finally {
@@ -82,7 +115,10 @@ export default function Dog({ id, url, includeActions, liked, score }) {
       />
       {includeActions && (
         <div className=" flex justify-between items-center border border-gray-200 py-4 px-4">
-          <button onClick={handleLike} className="group">
+          <button
+            onClick={liked ? handleDeleteLike : handleLike}
+            className="group"
+          >
             <HeartIcon
               className={`transition-colors ${
                 liked

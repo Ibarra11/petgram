@@ -14,9 +14,9 @@ const fetchDogs = async ({ pageParam }) => {
     return res.json();
   });
   const resForFavoritedDogs = fetch(
-    `${import.meta.env.VITE_FAVORITES_URL}&sub_id=${
-      import.meta.env.VITE_SUB_ID
-    }`
+    `${import.meta.env.VITE_FAVORITES_URL}?api_key=${
+      import.meta.env.VITE_API_KEY
+    }&sub_id=${import.meta.env.VITE_SUB_ID}`
   ).then((res) => {
     if (!res.ok) {
       throw new Error();
@@ -46,13 +46,10 @@ const fetchDogs = async ({ pageParam }) => {
       if (popularDog) {
         resultDog.score = popularDog.value;
       }
-
-      if (
-        favoritedDogs.some((favoritedDog) => {
-          return favoritedDog.image_id === dog.id;
-        })
-      ) {
+      const favoritedDog = favoritedDogs.find((d) => d.image_id === dog.id);
+      if (favoritedDog) {
         resultDog.liked = true;
+        resultDog.favoriteId = favoritedDog.id;
       }
       return resultDog;
     });
@@ -75,12 +72,13 @@ export default function Dogs() {
         data.pages.map((dogs, i) => {
           return (
             <React.Fragment key={i}>
-              {dogs.map(({ url, id, liked, score }) => (
+              {dogs.map(({ url, id, liked, score, favoriteId }) => (
                 <Dog
                   liked={liked}
                   includeActions={true}
                   key={id}
-                  id={id}
+                  imageId={id}
+                  favoriteId={favoriteId}
                   url={url}
                   score={score}
                 />

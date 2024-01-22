@@ -6,9 +6,11 @@ import useDogQuery from "../hooks/useDogQuery";
 
 const fetchFavoriteDogs = async ({ pageParam }) => {
   const res = await fetch(
-    `${import.meta.env.VITE_FAVORITES_URL}&limit=12&page=${pageParam}&sub_id=${
+    `${import.meta.env.VITE_FAVORITES_URL}?api_key=${
+      import.meta.env.VITE_API_KEY
+    }&limit=12&page=${pageParam}&sub_id=${
       import.meta.env.VITE_SUB_ID
-    }`
+    }&order=DESC`
   );
   if (!res.ok) {
     throw new Error("Something went wrong with request");
