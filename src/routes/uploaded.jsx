@@ -1,12 +1,10 @@
 import React from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import useAtBottom from "../hooks/useAtBottom";
 import Dog from "../components/Dog";
 import Spinner from "../components/Spinner";
 import DogSkeleton from "../components/DogSkeleton";
 import useDogQuery from "../hooks/useDogQuery";
 export default function UploadedDogs() {
-  const fetchDogs = async ({ pageParam }) => {
+  const fetchUploadedDogs = async ({ pageParam }) => {
     const res = await fetch(
       `${import.meta.env.VITE_UPLOADED_URL}&limit=12&sub_id=${
         import.meta.env.VITE_SUB_ID
@@ -18,27 +16,14 @@ export default function UploadedDogs() {
     return res.json();
   };
 
-  const {
-    data,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    isFetchingNextPage,
-    status,
-  } = useDogQuery("uploadedDogs", fetchDogs);
-
-  const isAtBottom = useAtBottom();
-
-  React.useEffect(() => {
-    if (isAtBottom && hasNextPage) {
-      fetchNextPage();
-    }
-  }, [isAtBottom]);
+  const { data, hasNextPage, isFetching, status } = useDogQuery(
+    "uploadedDogs",
+    fetchUploadedDogs
+  );
 
   return (
     <>
-      {status === "pending" || isFetching ? (
+      {status === "pending" ? (
         <DogSkeleton count={9} />
       ) : (
         data.pages.map((dogs, i) => {

@@ -21,7 +21,7 @@ export default function Popular() {
   );
   return (
     <>
-      {status === "pending" || isFetching ? (
+      {status === "pending" ? (
         <DogSkeleton count={9} />
       ) : (
         data.pages.map((dogs, i) => {

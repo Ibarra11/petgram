@@ -19,7 +19,7 @@ const fetchFavoriteDogs = async ({ pageParam }) => {
 };
 
 export default function Favorites() {
-  const { data, status, isFetching, hasNextPage } = useDogQuery(
+  const { data, status, hasNextPage } = useDogQuery(
     "favorites",
     fetchFavoriteDogs
   );

@@ -1,8 +1,14 @@
+import React from "react";
 import { Outlet, NavLink } from "react-router-dom";
 import { PlusIcon } from "@heroicons/react/24/solid";
+import Spinner from "../components/Spinner";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Root() {
+  const queryClient = useQueryClient();
+  const [isUploading, setIsUploading] = React.useState(false);
   async function handleUpload(e) {
+    setIsUploading(true);
     var myHeaders = new Headers();
     myHeaders.append("X-API-KEY", import.meta.env.VITE_API_KEY);
 
@@ -18,8 +24,14 @@ export default function Root() {
 
     fetch(import.meta.env.VITE_UPLOAD_URL, requestOptions)
       .then((response) => response.text())
-      .then((result) => console.log(result))
-      .catch((error) => console.log("error", error));
+      .then((result) => {
+        queryClient.invalidateQueries({ queryKey: ["uploadedDogs"] });
+        setIsUploading(false);
+      })
+      .catch((error) => {
+        console.log("error", error);
+        setIsUploading(false);
+      });
   }
   return (
     <div className="flex gap-12  pt-16 px-12 min-h-screen bg-gray-100 overflow-clip items-start">
@@ -92,8 +104,17 @@ export default function Root() {
             type="file"
           />
           <div className="absolute top-0 flex gap-2 items-center  justify-center w-full h-full pointer-events-none">
-            Upload
-            <PlusIcon size={16} width={16} />
+            {isUploading ? (
+              <div className="w-full px-2 items-center text-gray-700 flex justify-between">
+                Uploading
+                <Spinner />
+              </div>
+            ) : (
+              <>
+                Upload
+                <PlusIcon size={16} width={16} />
+              </>
+            )}
           </div>
         </div>
       </aside>
