@@ -88,7 +88,7 @@ export function DogWithActions({ imageId, favoriteId, url, liked, votes }) {
 
   return (
     <Dog url={url}>
-      <div className="flex justify-between items-center w-full ">
+      <div className="flex justify-between items-center w-full border border-gray-200 py-4 px-4">
         <button
           onClick={() =>
             liked

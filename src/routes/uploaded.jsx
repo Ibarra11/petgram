@@ -4,6 +4,7 @@ import useAtBottom from "../hooks/useAtBottom";
 import Dog from "../components/Dog";
 import Spinner from "../components/Spinner";
 import DogSkeleton from "../components/DogSkeleton";
+import useDogQuery from "../hooks/useDogQuery";
 export default function UploadedDogs() {
   const fetchDogs = async ({ pageParam }) => {
     const res = await fetch(
@@ -25,17 +26,8 @@ export default function UploadedDogs() {
     isFetching,
     isFetchingNextPage,
     status,
-  } = useInfiniteQuery({
-    queryKey: ["uploadedDogs"],
-    queryFn: fetchDogs,
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages, lastPageParam) => {
-      if (lastPage.length === 0) {
-        return undefined;
-      }
-      return lastPageParam + 1;
-    },
-  });
+  } = useDogQuery("uploadedDogs", fetchDogs);
+
   const isAtBottom = useAtBottom();
 
   React.useEffect(() => {
@@ -53,13 +45,13 @@ export default function UploadedDogs() {
           return (
             <React.Fragment key={i}>
               {dogs.map(({ url, id }) => (
-                <Dog includeActions={false} key={id} id={id} url={url} />
+                <Dog url={url} />
               ))}
             </React.Fragment>
           );
         })
       )}
-      {isFetching && hasNextPage && (
+      {hasNextPage && (
         <div className="absolute bottom-10 translate-y-1/2 left-1/2 -translate-x-1/2">
           <Spinner />
         </div>

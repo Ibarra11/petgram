@@ -34,7 +34,7 @@ export default function Popular() {
           );
         })
       )}
-      {isFetching && hasNextPage && (
+      {hasNextPage && (
         <div className="absolute bottom-10 translate-y-1/2 left-1/2 -translate-x-1/2">
           <Spinner />
         </div>
