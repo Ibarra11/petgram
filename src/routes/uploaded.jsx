@@ -5,11 +5,14 @@ import DogSkeleton from "../components/DogSkeleton";
 import useDogQuery from "../hooks/useDogQuery";
 export default function UploadedDogs() {
   const fetchUploadedDogs = async ({ pageParam }) => {
-    const res = await fetch(
-      `${import.meta.env.VITE_UPLOADED_URL}&limit=12&sub_id=${
-        import.meta.env.VITE_SUB_ID
-      }&page=${pageParam}`
-    );
+    const res = await Promise.any([
+      fetch(
+        `${import.meta.env.VITE_UPLOADED_URL}&limit=12&sub_id=${
+          import.meta.env.VITE_SUB_ID
+        }&page=${pageParam}`
+      ),
+    ]);
+
     if (!res.ok) {
       throw new Error("Something went wrong with request");
     }
@@ -30,7 +33,7 @@ export default function UploadedDogs() {
           return (
             <React.Fragment key={i}>
               {dogs.map(({ url, id }) => (
-                <Dog url={url} />
+                <Dog key={id} url={url} />
               ))}
             </React.Fragment>
           );
