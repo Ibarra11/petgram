@@ -1,5 +1,4 @@
 import React from "react";
-import Dog from "../components/Dog";
 import Spinner from "../components/Spinner";
 import DogSkeleton from "../components/DogSkeleton";
 import useDogQuery from "../hooks/useDogQuery";
@@ -40,12 +39,12 @@ const fetchDogs = async ({ pageParam }) => {
     ]);
 
     return dogs.map((dog) => {
-      const resultDog = { ...dog, score: 0, liked: false };
+      const resultDog = { ...dog, votes: 0, liked: false };
       const popularDog = popularDogs.find(
         (popularDog) => popularDog.image_id === dog.id
       );
       if (popularDog) {
-        resultDog.score = popularDog.value;
+        resultDog.votes = popularDog.value;
       }
       const favoritedDog = favoritedDogs.find((d) => d.image_id === dog.id);
       if (favoritedDog) {
@@ -73,7 +72,7 @@ export default function Dogs() {
         data.pages.map((dogs, i) => {
           return (
             <React.Fragment key={i}>
-              {dogs.map(({ url, id, liked, score, favoriteId }) => (
+              {dogs.map(({ url, id, liked, votes, favoriteId }) => (
                 <DogWithActions
                   liked={liked}
                   includeActions={true}
@@ -81,7 +80,7 @@ export default function Dogs() {
                   imageId={id}
                   favoriteId={favoriteId}
                   url={url}
-                  score={score}
+                  votes={votes}
                 />
               ))}
             </React.Fragment>
